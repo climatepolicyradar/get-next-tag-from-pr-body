@@ -6,10 +6,12 @@ inputs:
     description: |
       Body of pull request if inside a pull request
     required: false
+    default: ""
   pr_number:
     description: |
       Pull request number
     required: false
+    default: ""
   owner:
     description: |
       Repository Owning Organisation
@@ -28,7 +30,7 @@ runs:
 
   steps:
     - name: Debug
-      shell: bash
+      shell: sh
       run: |
         echo ${{ inputs.pr_body }}
         echo ${{ inputs.pr_number }}

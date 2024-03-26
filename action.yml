@@ -57,7 +57,7 @@ runs:
       # command injection attack
       env:
         PR_BODY: "${{ inputs.body }}"
-        PR_NUMBER: "${{ inputs.pr_number }}"
+        PR_NUMBER: "${{ inputs.number }}"
       run: |
         echo "Attempting to auto-tag merge commit2"
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")

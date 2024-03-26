@@ -66,7 +66,7 @@ runs:
     - name: Determine new tag version from PR event
       if: ${{ inputs.pr_body != '' && inputs.pr_number != ''}}
       shell: sh
-      id: determine_next_tag
+      id: determine_next_tag_from_pr_event
       # User controlled input needs to be santitised beforehand e.g., by adding an
       # intermediate env var to prevent the workflow being exposed to a critical
       # command injection attack

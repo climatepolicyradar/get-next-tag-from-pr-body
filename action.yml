@@ -6,12 +6,12 @@ inputs:
     description: |
       Body of pull request if inside a pull request
     required: false
-    default: ""
+    # default: ""
   pr_number:
     description: |
       Pull request number
     required: false
-    default: ""
+    # default: ""
   owner:
     description: |
       Repository Owning Organisation

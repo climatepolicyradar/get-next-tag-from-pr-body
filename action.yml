@@ -7,6 +7,7 @@ inputs:
       Body of pull request if inside a pull request
     required: false
     # default: ""
+
   PR_NUMBER:
     description: |
       Pull request number
@@ -27,7 +28,7 @@ runs:
       shell: sh
       run: |
         echo ${{ inputs['PR_BODY'] }}
-        echo ${{ inputs['number'] }}
+        echo ${{ inputs['PR_NUMBER'] }}
         echo ${{ inputs.PR_BODY }}
         echo ${{ inputs.PR_NUMBER }}
         echo ${{ inputs.PR_BODY == '' && inputs.PR_NUMBER == ''}}

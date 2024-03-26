@@ -78,7 +78,7 @@ runs:
       # intermediate env var to prevent the workflow being exposed to a critical
       # command injection attack
       env:
-        PR_BODY: "${{ inputs.pr_body }}"
+        PR_BODY: ${{ inputs.pr_body }}
         PR_NUMBER: ${{ inputs.pr_number }}
       run: |
         echo "Attempting to auto-tag merge commit"

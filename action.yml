@@ -50,7 +50,6 @@ runs:
     - uses: fregante/setup-git-user@v2
 
     - name: Determine new tag version
-      if: ${{ inputs.pr_body && inputs.pr_number }}
       shell: sh
       id: determine_next_tag
       # User controlled input needs to be santitised beforehand e.g., by adding an

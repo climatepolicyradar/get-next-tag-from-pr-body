@@ -67,3 +67,23 @@ runs:
         new_tag=$(echo "${script_output}" | tail -n 1)
         echo "New tag: ${new_tag}"
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
+
+    - name: Determine new tag version from PR event
+      if: ${{ inputs.pr_body != '' && inputs.pr_number != ''}}
+      shell: sh
+      id: determine_next_tag_from_pr_event
+      # User controlled input needs to be santitised beforehand e.g., by adding an
+      # intermediate env var to prevent the workflow being exposed to a critical
+      # command injection attack
+      env:
+        PR_BODY: "${{ inputs.pr_body }}"
+        PR_NUMBER: "${{ inputs.pr_number }}"
+      run: |
+        echo "Attempting to auto-tag merge commit2"
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        if $? != 0; then
+          exit 1
+        fi
+        new_tag=$(echo "${script_output}" | tail -n 1)
+        echo "New tag: ${new_tag}"
+        echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"

@@ -27,6 +27,13 @@ runs:
   using: "composite"
 
   steps:
+    - name: Debug
+      shell: bash
+      run: |
+        echo ${{ inputs.pr_body }}
+        echo ${{ inputs.pr_number }}
+        echo ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
+
     - uses: actions/github-script@v6
       if: ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
       id: get_pr_data

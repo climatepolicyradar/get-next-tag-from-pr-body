@@ -45,7 +45,7 @@ runs:
         echo "PR body or number empty: ${{ inputs.pr_body == '' || inputs.pr_number == '' }}"
 
     - uses: actions/github-script@v7
-      if: ${{ inputs.pr_body == '' && inputs.pr_number == '' }}
+      # if: ${{ inputs.pr_body == '' && inputs.pr_number == '' }}
       id: get_pr_data
       with:
         script: |
@@ -71,7 +71,7 @@ runs:
         PR_BODY: "${{ inputs.pr_body }}"
         PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
-        echo "Attempting to auto-tag merge commit2"
+        echo "Determining whether user has selected an auto-tag option..."
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
         if $? != 0; then
           exit 1

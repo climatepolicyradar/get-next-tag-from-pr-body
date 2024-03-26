@@ -56,18 +56,6 @@ runs:
       run: |
         echo "PR body and number not empty"
 
-    - uses: actions/github-script@v7
-      id: get_pr_data
-      with:
-        script: |
-          return (
-            await github.rest.repos.listPullRequestsAssociatedWithCommit({
-              commit_sha: context.sha,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            })
-          ).data[0];
-
     - uses: actions/checkout@v4
     - uses: fregante/setup-git-user@v2
 
@@ -90,6 +78,18 @@ runs:
         new_tag=$(echo "${script_output}" | tail -n 1)
         echo "New tag: ${new_tag}"
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
+
+    - uses: actions/github-script@v7
+      id: get_pr_data
+      with:
+        script: |
+          return (
+            await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              commit_sha: context.sha,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+          ).data[0];
 
     - name: Determine new tag version
       if: ${{ ! (inputs.pr_body != '' && inputs.pr_number != '') }}

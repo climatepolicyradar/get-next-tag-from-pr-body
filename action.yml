@@ -6,12 +6,10 @@ inputs:
     description: |
       Body of pull request if inside a pull request
     required: false
-    default: ""
   pr_number:
     description: |
       Pull request number
     required: false
-    default: ""
   owner:
     description: |
       Repository Owning Organisation
@@ -36,8 +34,8 @@ runs:
         echo ${{ inputs.pr_number }}
         echo ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
 
-    - uses: actions/github-script@v6
-      if: ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
+    - uses: actions/github-script@v7
+      if: ${{ inputs.pr_body && inputs.pr_number }}
       id: get_pr_data
       with:
         script: |
@@ -52,7 +50,7 @@ runs:
     - uses: actions/checkout@v4
     - uses: fregante/setup-git-user@v2
 
-    - name: Determine new tag version from retrospective PR parsing
+    - name: Determine new tag version
       if: ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
       shell: sh
       id: determine_next_tag
@@ -80,8 +78,8 @@ runs:
       # intermediate env var to prevent the workflow being exposed to a critical
       # command injection attack
       env:
-        PR_BODY: ${{ inputs.pr_body }}
-        PR_NUMBER: ${{ inputs.pr_number }}
+        PR_BODY: "${{ inputs.pr_body }}"
+        PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
         echo "Attempting to auto-tag merge commit"
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")

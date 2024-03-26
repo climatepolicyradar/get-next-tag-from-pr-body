@@ -29,9 +29,17 @@ runs:
   using: "composite"
 
   steps:
+    - name: Set GitHub Path
+      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+
     - name: Debug
       shell: sh
       run: |
+        echo ${{ inputs['pr_body'] }}
+        echo ${{ inputs['pr_number'] }}
         echo ${{ inputs.pr_body }}
         echo ${{ inputs.pr_number }}
         echo ${{ inputs.pr_body == '' && inputs.pr_number == ''}}

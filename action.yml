@@ -2,13 +2,13 @@ name: "Determine next tag from PR body"
 description: "Determine next tag from PR body"
 
 inputs:
-  sha:
+  pr_body:
     description: |
-      GitHub SHA
+      Body of pull request if inside a pull request
     required: false
-  repo_name:
+  pr_number:
     description: |
-      Repository Name
+      Pull request number
     required: false
   owner:
     description: |
@@ -28,6 +28,7 @@ runs:
 
   steps:
     - uses: actions/github-script@v6
+      if: ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
       id: get_pr_data
       with:
         script: |
@@ -42,25 +43,8 @@ runs:
     - uses: actions/checkout@v4
     - uses: fregante/setup-git-user@v2
 
-    - name: Dump GitHub context
-      shell: sh
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
-    - name: Dump job context
-      shell: sh
-      env:
-        JOB_CONTEXT: ${{ toJson(job) }}
-      run: echo "$JOB_CONTEXT"
-
-    - name: Dump steps context
-      shell: sh
-      env:
-        STEPS_CONTEXT: ${{ toJson(steps) }}
-      run: echo "$STEPS_CONTEXT"
-
-    - name: Determine new tag version
+    - name: Determine new tag version from retrospective PR parsing
+      if: ${{ inputs.pr_body == '' && inputs.pr_number == ''}}
       shell: sh
       id: determine_next_tag
       # User controlled input needs to be santitised beforehand e.g., by adding an
@@ -69,6 +53,26 @@ runs:
       env:
         PR_BODY: "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
         PR_NUMBER: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
+      run: |
+        echo "Attempting to auto-tag merge commit"
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        if $? != 0; then
+          exit 1
+        fi
+        new_tag=$(echo "${script_output}" | tail -n 1)
+        echo "New tag: ${new_tag}"
+        echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
+
+    - name: Determine new tag version from PR event
+      if: ${{ inputs.pr_body != '' && inputs.pr_number != ''}}
+      shell: sh
+      id: determine_next_tag
+      # User controlled input needs to be santitised beforehand e.g., by adding an
+      # intermediate env var to prevent the workflow being exposed to a critical
+      # command injection attack
+      env:
+        PR_BODY: "${{ inputs.pr_body }}"
+        PR_NUMBER: ${{ inputs.pr_number }}
       run: |
         echo "Attempting to auto-tag merge commit"
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")

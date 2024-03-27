@@ -80,7 +80,7 @@ runs:
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
 
     - uses: actions/github-script@v7
-      if: ${{ inputs.pr_body == '' && inputs.pr_number == '' }}
+      if: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}
       id: get_pr_data
       with:
         script: |
@@ -94,8 +94,6 @@ runs:
 
     - name: Debug
       if: ${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      # if: ${{ ! (inputs.pr_body != '' && inputs.pr_number != '') }}
-      # if: steps.test.outcome == 'success' && ${{ ! (inputs.pr_body != '' && inputs.pr_number != '') }}
       shell: sh
       run: |
         echo "Outcome: ${{ steps.get_pr_data.outcome }}"

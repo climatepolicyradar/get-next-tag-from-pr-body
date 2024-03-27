@@ -93,7 +93,7 @@ runs:
           ).data[0];
 
     - name: Debug
-      if: success() && ${{ ! (inputs.pr_body != '' && inputs.pr_number != '') }}
+      if: steps.get_pr_data.outcome == 'success'
       shell: sh
       run: |
         echo ${{ fromJson(steps.get_pr_data.outputs.result).number }}

@@ -92,21 +92,25 @@ runs:
           ).data[0];
 
     - name: Determine new tag version
-      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
       id: determine_next_tag
       # User controlled input needs to be santitised beforehand e.g., by adding an
       # intermediate env var to prevent the workflow being exposed to a critical
       # command injection attack
-      env:
-        ENV_PR_BODY: ${{ fromJson(steps.get_pr_data.outputs.result).body }}
-        ENV_PR_NUMBER: ${{ fromJson(steps.get_pr_data.outputs.result).number }}
+      # env:
+      #   ENV_PR_BODY: ${{ fromJson(steps.get_pr_data.outputs.result).body }}
+      #   ENV_PR_NUMBER: ${{ fromJson(steps.get_pr_data.outputs.result).number }}
       run: |
-        echo "Attempting to auto-tag merge commit"
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${ENV_PR_BODY}" "${ENV_PR_NUMBER}")
-        if $? != 0; then
-          exit 1
-        fi
-        new_tag=$(echo "${script_output}" | tail -n 1)
-        echo "New tag: ${new_tag}"
-        echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
+        echo "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}"
+        echo "${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}"
+        echo "${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}"
+
+# echo "Attempting to auto-tag merge commit"
+# script_output=$("${{ github.action_path }}/auto-tag.sh" "${ENV_PR_BODY}" "${ENV_PR_NUMBER}")
+# if $? != 0; then
+#   exit 1
+# fi
+# new_tag=$(echo "${script_output}" | tail -n 1)
+# echo "New tag: ${new_tag}"
+# echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"

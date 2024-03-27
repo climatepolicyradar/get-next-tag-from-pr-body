@@ -107,7 +107,7 @@ runs:
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
 
     - name: Set new_tag
-      shell: sh
+      shell: bash
       id: determine_next_tag
       run: |
         if [[ "${{ (inputs.pr_body != '' && inputs.pr_number != '') }}" ]]; then

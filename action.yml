@@ -36,26 +36,6 @@ runs:
       run: |
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
 
-    - name: Debug
-      shell: sh
-      run: |
-        echo "PR body and number empty: ${{ inputs.pr_body == '' && inputs.pr_number == '' }}"
-        echo "PR body and number not empty: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}"
-        echo "PR body and number empty: ${{ ! (inputs.pr_body != '' && inputs.pr_number != '') }}"
-        echo "PR body or number empty: ${{ inputs.pr_body == '' || inputs.pr_number == '' }}"
-
-    - name: Check conditionals work
-      if: ${{ inputs.pr_body == '' && inputs.pr_number == '' }}
-      shell: sh
-      run: |
-        echo "PR body and number empty"
-
-    - name: Check conditionals work 2
-      if: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}
-      shell: sh
-      run: |
-        echo "PR body and number not empty"
-
     - uses: actions/checkout@v4
     - uses: fregante/setup-git-user@v2
 

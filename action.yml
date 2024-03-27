@@ -112,7 +112,6 @@ runs:
       run: |
         if [[ "${{ (inputs.pr_body != '' && inputs.pr_number != '') }}" ]]; then
             echo "new_tag=${{ steps.determine_next_tag_from_pr_event.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
-        fi
-        if [[ "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}" ]]; then
+        elif [[ "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}" ]]; then
             echo "new_tag=${{ steps.determine_next_tag_retrospectively.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
         fi

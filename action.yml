@@ -95,7 +95,7 @@ runs:
     - name: Determine new tag version
       if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
-      id: determine_next_tag
+      id: determine_next_tag_retrospectively
       run: |
         echo "Attempting to auto-tag merge commit"
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${{ fromJson(steps.get_pr_data.outputs.result).body }}" "${{ fromJson(steps.get_pr_data.outputs.result).number }}")
@@ -105,3 +105,14 @@ runs:
         new_tag=$(echo "${script_output}" | tail -n 1)
         echo "New tag: ${new_tag}"
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
+
+    - name: Set new_tag
+      shell: sh
+      id: determine_next_tag
+      run: |
+        if [[ "${{ (inputs.pr_body != '' && inputs.pr_number != '') }}" ]]; then
+            echo "new_tag=${{ steps.determine_next_tag_from_pr_event.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
+        fi
+        if [[ "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}" ]]; then
+            echo "new_tag=${{ steps.determine_next_tag_retrospectively.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
+        fi

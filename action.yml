@@ -2,13 +2,13 @@ name: "Determine next tag from PR body"
 description: "Determine next tag from PR body"
 
 inputs:
-  PR_BODY:
+  pr_body:
     description: |
       Body of pull request if inside a pull request
     required: false
     # default: ""
 
-  PR_NUMBER:
+  pr_number:
     description: |
       Pull request number
     required: false

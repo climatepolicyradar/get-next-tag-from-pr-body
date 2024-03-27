@@ -2,22 +2,17 @@ name: "Determine next tag from PR body"
 description: "Determine next tag from PR body"
 
 inputs:
-  pr_body:
+  PR_BODY:
     description: |
       Body of pull request if inside a pull request
     required: false
     # default: ""
-  pr_number:
+
+  PR_NUMBER:
     description: |
       Pull request number
     required: false
     # default: ""
-  owner:
-    description: |
-      Repository Owning Organisation
-      Default is 'climatepolicyradar'.
-    default: "climatepolicyradar"
-    required: false
 
 # Expose step outputs as job outputs
 outputs:

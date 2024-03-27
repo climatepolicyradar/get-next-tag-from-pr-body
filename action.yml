@@ -91,3 +91,8 @@ runs:
             })
           ).data[0];
 
+    - name: Debug
+      shell: sh
+      run: |
+        echo ${{ fromJson(steps.get_pr_data.outputs.result).number }}
+        echo ${{ fromJson(steps.get_pr_data.outputs.result).body }}

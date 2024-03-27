@@ -96,8 +96,9 @@ runs:
       # if: steps.test.outcome == 'success' && ${{ ! (inputs.pr_body != '' && inputs.pr_number != '') }}
       shell: sh
       run: |
-        echo ${{ steps.get_pr_data.outcome }}
-        echo ${{ steps.get_pr_data.conclusion }}
-        echo ${{ steps.get_pr_data.outputs.result }}
-        echo ${{ fromJson(steps.get_pr_data.outputs.result).number }}
-        echo ${{ fromJson(steps.get_pr_data.outputs.result).body }}
+        echo "Outcome: ${{ steps.get_pr_data.outcome }}"
+        echo "Outputs: ${{ steps.get_pr_data.outputs }}"
+        echo "Conclusion: ${{ steps.get_pr_data.conclusion }}"
+        echo "Result: ${{ steps.get_pr_data.outputs.result }}"
+        echo "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
+        echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"

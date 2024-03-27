@@ -112,6 +112,14 @@ load '/opt/bats-test-helpers/lox-bats-mock/stub.bash'
 
 }
 
+@test "is_skip_selected returns correctly when Skip checkbox checked" {
+  source /code/funcs.sh
+  run is_skip_selected "[x] Skip auto-tagging"
+  [ "$status" -eq 0 ]
+  [ "$output" == "true" ]
+
+}
+
 # ------
 
 @test "is_patch_selected returns false when Patch checkbox not found" {
@@ -133,6 +141,14 @@ load '/opt/bats-test-helpers/lox-bats-mock/stub.bash'
 @test "is_major_selected returns false when Major checkbox not found" {
   source /code/funcs.sh
   run is_major_selected "[x] cucumber"
+  [ "$status" -eq 0 ]
+  [ "$output" == "false" ]
+
+}
+
+@test "is_skip_selected returns false when Skip checkbox not found" {
+  source /code/funcs.sh
+  run is_skip_selected "[x] cucumber"
   [ "$status" -eq 0 ]
   [ "$output" == "false" ]
 

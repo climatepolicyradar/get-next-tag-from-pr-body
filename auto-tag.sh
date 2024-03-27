@@ -15,6 +15,7 @@ echo "Latest tag: ${latest_tag}"
 pr_body="$1"
 
 # Get selected versioning checkboxes.
+is_skip=$(is_skip_selected "${pr_body}")
 is_patch=$(is_patch_selected "${pr_body}")
 is_minor=$(is_minor_selected "${pr_body}")
 is_major=$(is_major_selected "${pr_body}")
@@ -54,9 +55,13 @@ else
 fi
 
 # If multiple have been checked or none have been checked, don't auto tag.
-if { [[ ${is_minor} == false ]] && [[ ${is_patch} == false ]] && [[ ${is_major} == false ]]; }; then
+if { [[ ${is_minor} == false ]] && [[ ${is_patch} == false ]] && [[ ${is_major} == false ]] && [[ ${is_skip} == false ]]; }; then
 	echo "No tag information found in body of pull request #${pr_number}. Auto-tagging failed..."
 	exit 1
 fi
 
-echo "${new_tag}"
+if [[ ${is_skip} == true ]]; then
+	echo "Skip"
+else
+	echo "${new_tag}"
+fi

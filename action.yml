@@ -24,17 +24,38 @@ runs:
   using: "composite"
 
   steps:
-    - name: Debug
-      shell: sh
+    - name: Set GitHub Path
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
       run: |
-        echo ${{ inputs['PR_BODY'] }}
-        echo ${{ inputs['PR_NUMBER'] }}
-        echo ${{ inputs.PR_BODY }}
-        echo ${{ inputs.PR_NUMBER }}
-        echo ${{ inputs.PR_BODY == '' && inputs.PR_NUMBER == ''}}
+        echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+
+    - uses: actions/checkout@v4
+    - uses: fregante/setup-git-user@v2
+
+    - name: Determine new tag version from PR event
+      if: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}
+      shell: sh
+      id: determine_next_tag_from_pr_event
+      # User controlled input needs to be santitised beforehand e.g., by adding an
+      # intermediate env var to prevent the workflow being exposed to a critical
+      # command injection attack
+      env:
+        PR_BODY: "${{ inputs.pr_body }}"
+        PR_NUMBER: "${{ inputs.pr_number }}"
+      run: |
+        echo "Determining whether user has selected an auto-tag option..."
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        if $? != 0; then
+          exit 1
+        fi
+        new_tag=$(echo "${script_output}" | tail -n 1)
+        echo "New tag: ${new_tag}"
+        echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
 
     - uses: actions/github-script@v7
-      if: ${{ inputs.PR_BODY == '' && inputs.PR_NUMBER == '' }}
+      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') }}
       id: get_pr_data
       with:
         script: |
@@ -46,39 +67,26 @@ runs:
             })
           ).data[0];
 
-    - uses: actions/checkout@v4
-    - uses: fregante/setup-git-user@v2
-
-    - name: Determine new tag version from PR event
-      if: ${{ inputs.PR_BODY != '' && inputs.PR_NUMBER != ''}}
-      shell: sh
-      id: determine_next_tag_from_pr_event
-      run: |
-        echo "Checking whether tag version can be determined from PR body..."
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${{ inputs.PR_BODY }}" "${{ inputs.PR_NUMBER }}")
-        if $? != 0; then
-          exit 1
-        fi
-        new_tag=$(echo "${script_output}" | tail -n 1)
-        echo "New tag: ${new_tag}"
-        echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
-
     - name: Determine new tag version
-      if: ${{ inputs.PR_BODY == '' && inputs.PR_NUMBER == '' }}
+      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
-      id: determine_next_tag
-      # User controlled input needs to be santitised beforehand e.g., by adding an
-      # intermediate env var to prevent the workflow being exposed to a critical
-      # command injection attack
-      env:
-        PR_BODY_FROM_JSON: "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-        PR_NUMBER_FROM_JSON: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
+      id: determine_next_tag_retrospectively
       run: |
         echo "Attempting to auto-tag merge commit"
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY_FROM_JSON}" "${PR_NUMBER_FROM_JSON}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${{ fromJson(steps.get_pr_data.outputs.result).body }}" "${{ fromJson(steps.get_pr_data.outputs.result).number }}")
         if $? != 0; then
           exit 1
         fi
         new_tag=$(echo "${script_output}" | tail -n 1)
         echo "New tag: ${new_tag}"
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
+
+    - name: Set new_tag
+      shell: bash
+      id: determine_next_tag
+      run: |
+        if [[ "${{ (inputs.pr_body != '' && inputs.pr_number != '') }}" ]]; then
+            echo "new_tag=${{ steps.determine_next_tag_from_pr_event.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
+        elif [[ "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}" ]]; then
+            echo "new_tag=${{ steps.determine_next_tag_retrospectively.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
+        fi

@@ -106,6 +106,11 @@ is_major_selected() {
 	is_selected "$1" "${phrase}"
 }
 
+is_skip_selected() {
+	local phrase="Skip auto-tagging"
+	is_selected "$1" "${phrase}"
+}
+
 get_latest_tag() {
 	git fetch --prune --unshallow --tags --force # This is needed - without it no tags are found.
 	latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)

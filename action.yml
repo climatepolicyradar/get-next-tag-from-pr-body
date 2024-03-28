@@ -6,13 +6,11 @@ inputs:
     description: |
       Body of pull request if inside a pull request
     required: false
-    # default: ""
 
   pr_number:
     description: |
       Pull request number
     required: false
-    # default: ""
 
 # Expose step outputs as job outputs
 outputs:

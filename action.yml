@@ -85,6 +85,8 @@ runs:
       shell: bash
       id: determine_next_tag
       run: |
+        echo "PR body and number present: ${{ (inputs.pr_body != '' && inputs.pr_number != '') }}"
+        echo "PR body and number not present: ${{ (inputs.pr_body == '' && inputs.pr_number == '') }}"
         if [[ ${{ (inputs.pr_body != '' && inputs.pr_number != '') == true }} ]]; then
             echo "new_tag=${{ steps.determine_next_tag_from_pr_event.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
         elif [[ ${{ (inputs.pr_body == '' && inputs.pr_number == '') }} == true ]]; then

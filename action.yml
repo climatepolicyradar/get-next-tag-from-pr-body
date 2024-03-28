@@ -72,7 +72,7 @@ runs:
       shell: sh
       id: determine_next_tag_retrospectively
       run: |
-        echo "Attempting to auto-tag merge commit"
+        echo "Determining whether user selected an auto-tag option..."
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${{ fromJson(steps.get_pr_data.outputs.result).body }}" "${{ fromJson(steps.get_pr_data.outputs.result).number }}")
         if $? != 0; then
           exit 1
@@ -85,8 +85,8 @@ runs:
       shell: bash
       id: determine_next_tag
       run: |
-        if [[ "${{ (inputs.pr_body != '' && inputs.pr_number != '') }}" ]]; then
+        if [[ "${{ (inputs.pr_body != '' && inputs.pr_number != '') == 'true' }}" ]]; then
             echo "new_tag=${{ steps.determine_next_tag_from_pr_event.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
-        elif [[ "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}" ]]; then
+        elif [[ "${{ (inputs.pr_body == '' && inputs.pr_number == '') }}" == 'true' ]]; then
             echo "new_tag=${{ steps.determine_next_tag_retrospectively.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
         fi

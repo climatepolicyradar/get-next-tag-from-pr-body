@@ -85,8 +85,10 @@ runs:
       shell: bash
       id: determine_next_tag
       run: |
-        if [[ ${{ (inputs.pr_body != '' && inputs.pr_number != '') == 'true' }} ]]; then
+        if [[ ${{ (inputs.pr_body != '' && inputs.pr_number != '') == true }} ]]; then
             echo "new_tag=${{ steps.determine_next_tag_from_pr_event.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
-        elif [[ ${{ (inputs.pr_body == '' && inputs.pr_number == '') }} == 'true' ]]; then
+        elif [[ ${{ (inputs.pr_body == '' && inputs.pr_number == '') }} == true ]]; then
             echo "new_tag=${{ steps.determine_next_tag_retrospectively.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
+        else
+            echo "PR body or number present. Either both or neither must be passed."
         fi

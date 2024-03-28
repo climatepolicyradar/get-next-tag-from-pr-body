@@ -16,6 +16,9 @@ inputs:
 
 # Expose step outputs as job outputs
 outputs:
+  current_tag:
+    description: "Current tag version"
+    value: ${{ steps.determine_current_tag.outputs.current_tag }}
   new_tag:
     description: "Next tag version"
     value: ${{ steps.determine_next_tag.outputs.new_tag }}
@@ -33,6 +36,19 @@ runs:
 
     - uses: actions/checkout@v4
     - uses: fregante/setup-git-user@v2
+
+    - name: Determine current tag
+      id: determine_current_tag
+      shell: sh
+      run: |
+        source "${{ github.action_path }}/funcs.sh"
+        current_tag=$(get_latest_tag)
+        if [ -z "${current_tag}" ]; then
+          exit 1;
+        else
+          echo "Current tag: ${new_tag}"
+          echo "current_tag=${current_tag}"  >> "$GITHUB_OUTPUT"
+        fi
 
     - name: Determine new tag version from PR event
       if: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}

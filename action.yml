@@ -39,11 +39,11 @@ runs:
 
     - name: Determine current tag
       id: determine_current_tag
-      shell: sh
+      shell: bash
       run: |
         source "${{ github.action_path }}/funcs.sh"
         current_tag=$(get_latest_tag)
-        if [ -z "${current_tag}" ]; then
+        if [[ -z "${current_tag}" ]]; then
           exit 1;
         else
           echo "Current tag: ${new_tag}"

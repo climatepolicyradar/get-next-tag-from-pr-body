@@ -46,7 +46,7 @@ runs:
         if [[ -z "${current_tag}" ]]; then
           exit 1;
         else
-          echo "Current tag: ${new_tag}"
+          echo "Current tag: ${current_tag}"
           echo "current_tag=${current_tag}"  >> "$GITHUB_OUTPUT"
         fi
 

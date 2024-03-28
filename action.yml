@@ -37,19 +37,6 @@ runs:
     - uses: actions/checkout@v4
     - uses: fregante/setup-git-user@v2
 
-    - name: Determine current tag
-      id: determine_current_tag
-      shell: bash
-      run: |
-        source "${{ github.action_path }}/funcs.sh"
-        current_tag=$(get_latest_tag)
-        if [[ -z "${current_tag}" ]]; then
-          exit 1;
-        else
-          echo "Current tag: ${current_tag}"
-          echo "current_tag=${current_tag}"  >> "$GITHUB_OUTPUT"
-        fi
-
     - name: Determine new tag version from PR event
       if: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}
       shell: sh
@@ -110,4 +97,17 @@ runs:
             echo "new_tag=${{ steps.determine_next_tag_retrospectively.outputs.new_tag }}"  >> "$GITHUB_OUTPUT"
         else
             echo "PR body or number present. Either both or neither must be passed."
+        fi
+
+    - name: Determine current tag
+      id: determine_current_tag
+      shell: bash
+      run: |
+        source "${{ github.action_path }}/funcs.sh"
+        current_tag=$(get_latest_tag)
+        if [[ -z "${current_tag}" ]]; then
+          exit 1;
+        else
+          echo "Current tag: ${current_tag}"
+          echo "current_tag=${current_tag}"  >> "$GITHUB_OUTPUT"
         fi

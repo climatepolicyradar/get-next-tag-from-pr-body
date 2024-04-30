@@ -75,6 +75,7 @@ runs:
         PR_NUMBER: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
       id: determine_next_tag_retrospectively
       run: |
+        bash --help
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
 

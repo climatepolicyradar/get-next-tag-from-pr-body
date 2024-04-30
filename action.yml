@@ -78,12 +78,14 @@ runs:
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
 
-        pr_body=$("${{ fromJson(steps.get_pr_data.outputs.result).body }}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
+        pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        pr_body_esc="${pr_body@Q}"
+        tag_pr_body_section=$("${pr_body_esc}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
 
         echo "Dumping PR body to file..."
         pr_dump_file="./tmp_pr_body_dump.txt"
         touch "${pr_dump_file}"
-        printf '%q\n' "${pr_body}" > "${pr_dump_file}"
+        printf '%q\n' "${tag_pr_body_section}" > "${pr_dump_file}"
         cat "${pr_dump_file}"
 
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${pr_dump_file}"

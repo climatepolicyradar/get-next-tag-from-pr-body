@@ -12,8 +12,8 @@ if [[ -z ${latest_tag} ]]; then
 fi
 echo "Latest tag: ${latest_tag}"
 
-pr_body="$(echo ${PR_BODY} | envsubst)"
-pr_tag_section=$("${pr_body}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
+pr_body_file=$1
+pr_tag_section=$(${pr_body_file} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
 
 # Get selected versioning checkboxes.
 is_skip=$(is_skip_selected "${pr_tag_section}")

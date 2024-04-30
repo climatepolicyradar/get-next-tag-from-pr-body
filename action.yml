@@ -81,7 +81,7 @@ runs:
         echo "Dumping PR body to file..."
         pr_dump_file="./tmp_pr_body_dump.txt"
         touch "${pr_dump_file}"
-        echo $("${{ fromJson(steps.get_pr_data.outputs.result).body }}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}') > "${pr_dump_file}"
+        echo $("${{ fromJson(steps.get_pr_data.outputs.result).body }}") > "${pr_dump_file}"
 
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${pr_dump_file}"
         if $? != 0; then

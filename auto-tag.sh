@@ -13,12 +13,13 @@ fi
 echo "Latest tag: ${latest_tag}"
 
 pr_body="$1"
+pr_tag_section=$("${pr_body}" | awk '/^## Proposed version/,/^### Notes/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
 
 # Get selected versioning checkboxes.
-is_skip=$(is_skip_selected "${pr_body}")
-is_patch=$(is_patch_selected "${pr_body}")
-is_minor=$(is_minor_selected "${pr_body}")
-is_major=$(is_major_selected "${pr_body}")
+is_skip=$(is_skip_selected "${pr_tag_section}")
+is_patch=$(is_patch_selected "${pr_tag_section}")
+is_minor=$(is_minor_selected "${pr_tag_section}")
+is_major=$(is_major_selected "${pr_tag_section}")
 
 pr_number="$2"
 

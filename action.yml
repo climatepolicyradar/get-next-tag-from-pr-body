@@ -47,7 +47,7 @@ runs:
         PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
         echo "Determining whether user has selected an auto-tag option..."
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh"
         if $? != 0; then
           exit 1
         fi
@@ -71,15 +71,15 @@ runs:
     - name: Determine new tag version
       if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
+      env:
+        PR_BODY: "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        PR_NUMBER: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
       id: determine_next_tag_retrospectively
       run: |
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
 
-        PR_BODY="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-        ESCAPED_PR_BODY="$(echo $PR_BODY | envsubst)"
-
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${ESCAPED_PR_BODY}" "${{ fromJson(steps.get_pr_data.outputs.result).number }}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh"
         if $? != 0; then
           exit 1
         fi

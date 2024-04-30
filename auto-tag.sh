@@ -12,7 +12,7 @@ if [[ -z ${latest_tag} ]]; then
 fi
 echo "Latest tag: ${latest_tag}"
 
-pr_body="$1"
+pr_body="$(echo ${PR_BODY} | envsubst)"
 pr_tag_section=$("${pr_body}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
 
 # Get selected versioning checkboxes.
@@ -21,7 +21,7 @@ is_patch=$(is_patch_selected "${pr_tag_section}")
 is_minor=$(is_minor_selected "${pr_tag_section}")
 is_major=$(is_major_selected "${pr_tag_section}")
 
-pr_number="$2"
+pr_number="${PR_NUMBER}"
 
 if { [[ ${is_minor} == true ]] && [[ ${is_patch} == true ]]; } ||
 	{ [[ ${is_minor} == true ]] && [[ ${is_major} == true ]]; } ||

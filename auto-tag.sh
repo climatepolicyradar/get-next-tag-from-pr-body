@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -euox pipefail
 
 script_folder=$(dirname "${BASH_SOURCE[0]}")
 source "${script_folder}"/funcs.sh
@@ -13,7 +13,7 @@ fi
 echo "Latest tag: ${latest_tag}"
 
 pr_body="$1"
-pr_tag_section=$("${pr_body}" | awk '/^## Proposed version/,/^### Notes/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
+pr_tag_section=$("${pr_body}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
 
 # Get selected versioning checkboxes.
 is_skip=$(is_skip_selected "${pr_tag_section}")

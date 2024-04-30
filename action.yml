@@ -74,9 +74,10 @@ runs:
       id: determine_next_tag_retrospectively
       run: |
         echo "Determining whether user selected an auto-tag option..."
+        echo "Using GitHub script to get PR info..."
 
-        export PR_BODY=${{ fromJson(steps.get_pr_data.outputs.result).body }}
-        export ESCAPED_PR_BODY="$(echo $PR_BODY | envsubst)"
+        PR_BODY="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        ESCAPED_PR_BODY="$(echo $PR_BODY | envsubst)"
 
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${ESCAPED_PR_BODY}" "${{ fromJson(steps.get_pr_data.outputs.result).number }}")
         if $? != 0; then

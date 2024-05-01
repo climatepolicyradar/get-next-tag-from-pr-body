@@ -44,8 +44,17 @@ runs:
       # command injection attack
       run: |
         PR_NUMBER="${{ inputs.pr_number }}"
-        PR_BODY=${{ inputs.pr_body }}
-        echo $PR_BODY
+
+        pr_dump_file="./escaped_pr_body"
+        rm -f "${pr_dump_file}"
+        echo "Dumping PR body to file..."
+        cat > "${pr_dump_file}" <<EOF
+        "${{ inputs.pr_body }}"
+        EOF
+
+        echo "Cat-ting ${pr_dump_file}..."
+        cat "${pr_dump_file}"
+        PR_BODY=$(cat "${pr_dump_file}")
 
         echo "Determining whether user has selected an auto-tag option..."
         script_output=$("${{ github.action_path }}/auto-tag.sh"
@@ -75,10 +84,20 @@ runs:
       shell: sh
       id: determine_next_tag_retrospectively
       run: |
-        echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
+        pr_dump_file="./escaped_pr_body"
+        rm -f "${pr_dump_file}"
+        echo "Dumping PR body to file..."
+        cat > "${pr_dump_file}" <<EOF
+        "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        EOF
+
+        echo "Cat-ting ${pr_dump_file}..."
+        cat "${pr_dump_file}"
+
+        echo "Determining whether user selected an auto-tag option..."
         PR_NUMBER=${{ fromJson(steps.get_pr_data.outputs.result).number }}
-        PR_BODY=${{ fromJson(steps.get_pr_data.outputs.result).body }}
+        PR_BODY=$(cat "${pr_dump_file}")
         script_output=$("${{ github.action_path }}/auto-tag.sh"
         if $? != 0; then
           exit 1

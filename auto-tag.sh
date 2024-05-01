@@ -13,7 +13,6 @@ fi
 echo "Latest tag: ${latest_tag}"
 
 pr_body="${PR_BODY}"
-# pr_body=$(cat "${pr_body_file}")
 
 # Get selected versioning checkboxes.
 is_skip=$(is_skip_selected "${pr_body}")

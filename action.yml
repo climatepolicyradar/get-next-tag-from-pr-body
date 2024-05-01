@@ -46,15 +46,15 @@ runs:
         PR_NUMBER="${{ inputs.pr_number }}"
 
         pr_dump_file="./escaped_pr_body"
-        rm -f "${pr_dump_file}"
-        touch "${pr_dump_file}"
+        rm -f "$pr_dump_file"
+        touch "$pr_dump_file"
         echo "Dumping PR body to file..."
         set -x
-        cat <<< "${{ inputs.pr_body }}" > "${pr_dump_file}"
+        cat > "${{ inputs.pr_body }}" > "$pr_dump_file"
 
-        echo "Cat-ting ${pr_dump_file}..."
-        cat "${pr_dump_file}"
-        PR_BODY=$(cat "${pr_dump_file}")
+        echo "Cat-ting $pr_dump_file..."
+        cat "$pr_dump_file"
+        PR_BODY=$(cat "$pr_dump_file")
 
         echo "Determining whether user has selected an auto-tag option..."
         script_output=$("${{ github.action_path }}/auto-tag.sh"

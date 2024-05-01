@@ -68,6 +68,19 @@ runs:
             })
           ).data[0];
 
+    - name: Dump PR body file
+      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      env:
+        pr_dump_file: "./tmp_pr_body_dump.txt"
+      run: |
+        echo "Dumping PR body to file..."
+        touch "${pr_dump_file}"
+        cat > "${pr_dump_file}" <<EOF
+        "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        EOF
+        cat "${pr_dump_file}"
+
     - name: Determine new tag version
       if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
@@ -78,17 +91,7 @@ runs:
         bash --help
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
-
-        pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-        pr_body_esc="${pr_body@Q}"
-        tag_pr_body_section=$("${pr_body_esc}" | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')
-
-        echo "Dumping PR body to file..."
         pr_dump_file="./tmp_pr_body_dump.txt"
-        touch "${pr_dump_file}"
-        printf '%q\n' "${tag_pr_body_section}" > "${pr_dump_file}"
-        cat "${pr_dump_file}"
-
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${pr_dump_file}"
         if $? != 0; then
           exit 1

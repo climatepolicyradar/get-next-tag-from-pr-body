@@ -75,12 +75,12 @@ runs:
       if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
       env:
-        PR_BODY: ${{ fromJson(steps.get_pr_data.outputs.result).body }}
         PR_NUMBER: ${{ fromJson(steps.get_pr_data.outputs.result).number }}
       id: determine_next_tag_retrospectively
       run: |
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
+        PR_BODY=${{ fromJson(steps.get_pr_data.outputs.result).body }}
         script_output=$("${{ github.action_path }}/auto-tag.sh"
         if $? != 0; then
           exit 1

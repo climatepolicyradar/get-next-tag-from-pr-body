@@ -42,24 +42,12 @@ runs:
       # User controlled input needs to be santitised beforehand e.g., by adding an
       # intermediate env var to prevent the workflow being exposed to a critical
       # command injection attack
+      env:
+        PR_BODY: "${{ inputs.pr_body }}"
+        PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
-        PR_NUMBER="${{ inputs.pr_number }}"
-
-        pr_dump_file="./escaped_pr_body"
-        rm -f "${pr_dump_file}"
-        touch "${pr_dump_file}"
-        echo "Dumping PR body to file..."
-        cat > "${pr_dump_file}" <<EOF
-        "${{ inputs.pr_body }}"
-        EOF
-
-        echo "Cat-ting ${pr_dump_file}..."
-        cat "${pr_dump_file}"
-
         echo "Determining whether user has selected an auto-tag option..."
-        PR_BODY="$(cat ${pr_dump_file})"
-        script_output=$("${{ github.action_path }}/auto-tag.sh")
-
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}")
         if $? != 0; then
           exit 1
         fi
@@ -82,15 +70,17 @@ runs:
 
     - name: Determine new tag version
       if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: sh
+      shell: bash
       id: determine_next_tag_retrospectively
+      env:
+        pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
-        echo "Using GitHub script to get PR info..."
-        pr_dump_file="./escaped_pr_body"
-        rm -f "${pr_dump_file}"
         echo "Dumping PR body to file..."
+        rm -f "${pr_dump_file}"
+        touch "${pr_dump_file}"
+        pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
         cat > "${pr_dump_file}" <<EOF
-        "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        "${pr_body}"
         EOF
 
         echo "Cat-ting ${pr_dump_file}..."
@@ -98,8 +88,7 @@ runs:
 
         echo "Determining whether user selected an auto-tag option..."
         PR_NUMBER=${{ fromJson(steps.get_pr_data.outputs.result).number }}
-        PR_BODY=$(cat "${pr_dump_file}")
-        script_output=$("${{ github.action_path }}/auto-tag.sh"
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${pr_dump_file}")
         if $? != 0; then
           exit 1
         fi

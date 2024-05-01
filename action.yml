@@ -45,9 +45,8 @@ runs:
       env:
         PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
-        echo "Determining section to parse..."
         PR_BODY=${{ inputs.pr_body }}
-        echo "Success"
+        echo $PR_BODY
 
         echo "Determining whether user has selected an auto-tag option..."
         script_output=$("${{ github.action_path }}/auto-tag.sh"

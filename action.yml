@@ -79,6 +79,7 @@ runs:
         cat > "${pr_dump_file}" <<EOF
         "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
         EOF
+        echo "Cat-ting ${pr_dump_file}..."
         cat "${pr_dump_file}"
 
     - name: Determine new tag version
@@ -88,7 +89,6 @@ runs:
         PR_NUMBER: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
       id: determine_next_tag_retrospectively
       run: |
-        bash --help
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
         pr_dump_file="./tmp_pr_body_dump.txt"

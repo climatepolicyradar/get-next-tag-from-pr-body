@@ -47,7 +47,7 @@ runs:
         PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
         echo "Determining whether user has selected an auto-tag option..."
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh")
         if $? != 0; then
           exit 1
         fi

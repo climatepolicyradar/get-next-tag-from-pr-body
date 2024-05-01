@@ -12,14 +12,14 @@ if [[ -z ${latest_tag} ]]; then
 fi
 echo "Latest tag: ${latest_tag}"
 
-pr_body_file="$1"
-pr_body=$(cat "${pr_body_file}")
+# pr_body_file="$1"
+# pr_body=$(cat "${pr_body_file}")
 
 # Get selected versioning checkboxes.
-is_skip=$(is_skip_selected "${pr_body}")
-is_patch=$(is_patch_selected "${pr_body}")
-is_minor=$(is_minor_selected "${pr_body}")
-is_major=$(is_major_selected "${pr_body}")
+is_skip=$(is_skip_selected "${PR_BODY}")
+is_patch=$(is_patch_selected "${PR_BODY}")
+is_minor=$(is_minor_selected "${PR_BODY}")
+is_major=$(is_major_selected "${PR_BODY}")
 
 pr_number="${PR_NUMBER}"
 

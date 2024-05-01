@@ -50,12 +50,10 @@ runs:
         touch "${pr_dump_file}"
         echo "Dumping PR body to file..."
         set -x
-        cat > "./escaped_pr_body" <<EOF
-        "${{ inputs.pr_body }}"
-        EOF
+        cat <<< "${{ inputs.pr_body }}" > "${pr_dump_file}"
 
         echo "Cat-ting ${pr_dump_file}..."
-        cat "./escaped_pr_body"
+        cat "${pr_dump_file}"
         PR_BODY=$(cat "${pr_dump_file}")
 
         echo "Determining whether user has selected an auto-tag option..."

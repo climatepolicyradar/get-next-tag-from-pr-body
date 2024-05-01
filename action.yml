@@ -20,6 +20,9 @@ outputs:
   new_tag:
     description: "Next tag version"
     value: ${{ steps.determine_next_tag.outputs.new_tag }}
+  escaped_pr_body:
+    description: "Escaped PR body"
+    value: ${{ steps.escape_pr_body.outputs.escaped_pr_body }}
 
 runs:
   using: "composite"
@@ -71,18 +74,18 @@ runs:
     - name: Dump PR body file
       # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       if: ${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      id: escape_pr_body
       shell: bash
       env:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
         echo "Dumping PR body to file..."
         rm -f "${pr_dump_file}"
-        touch "${pr_dump_file}"
         pr_body=${{ fromJson(steps.get_pr_data.outputs.result).body }}
+        echo '${pr_body}' > "${pr_dump_file}"
 
-        cat > "${pr_dump_file}" <<EOF
-        "${pr_body}"
-        EOF
+        echo "Escaped PR body: ${pr_body}"
+        echo "escaped_pr_body=${pr_body}" >> "$GITHUB_OUTPUT"
 
         echo "Cat-ting ${pr_dump_file}..."
         cat "${pr_dump_file}"

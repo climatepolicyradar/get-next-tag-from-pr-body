@@ -37,7 +37,7 @@ runs:
 
     - name: Determine new tag version from PR event
       if: ${{ inputs.pr_body != '' && inputs.pr_number != '' }}
-      shell: sh
+      shell: bash
       id: determine_next_tag_from_pr_event
       # User controlled input needs to be santitised beforehand e.g., by adding an
       # intermediate env var to prevent the workflow being exposed to a critical
@@ -49,11 +49,9 @@ runs:
         rm -f "$pr_dump_file"
         touch "$pr_dump_file"
         echo "Dumping PR body to file..."
-        pr_body="${{ inputs.pr_body }}"
-        set -x
-
-        cat <<< \""${{ inputs.pr_body }}"\" > "${pr_dump_file}"
-
+        cat > "${pr_dump_file}" <<EOF
+        "${{ inputs.pr_body }}"
+        EOF
 
         echo "Cat-ting $pr_dump_file..."
         cat "$pr_dump_file"

@@ -49,7 +49,7 @@ runs:
         rm -f "$pr_dump_file"
         touch "$pr_dump_file"
         echo "Dumping PR body to file..."
-        pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        pr_body="${{ inputs.pr_body }}"
         set -x
         cat > "${pr_dump_file}" <<EOF
         "${pr_body}"

@@ -77,8 +77,9 @@ runs:
         echo "Dumping PR body to file..."
         rm -f "${pr_dump_file}"
         touch "${pr_dump_file}"
+        pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
         cat > "${pr_dump_file}" <<EOF
-        "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        "${pr_body}"
         EOF
         echo "Cat-ting ${pr_dump_file}..."
         cat "${pr_dump_file}"

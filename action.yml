@@ -50,7 +50,7 @@ runs:
         PR_NUMBER: "${{ inputs.pr_number }}"
       run: |
         echo "Determining whether user has selected an auto-tag option..."
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh"
         if $? != 0; then
           exit 1
         fi
@@ -59,7 +59,7 @@ runs:
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
 
     - uses: actions/github-script@v7
-      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') }}
+      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') }}
       id: get_pr_data
       with:
         script: |
@@ -71,28 +71,8 @@ runs:
             })
           ).data[0];
 
-    - name: Dump PR body file
-      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      if: ${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      id: escape_pr_body
-      shell: bash
-      env:
-        pr_dump_file: "./tmp_pr_body_dump.txt"
-      run: |
-        echo "Dumping PR body to file..."
-        rm -f "${pr_dump_file}"
-        pr_body=${{ fromJson(steps.get_pr_data.outputs.result).body }}
-        echo '${pr_body}' > "${pr_dump_file}"
-
-        echo "Escaped PR body: ${pr_body}"
-        echo "escaped_pr_body=${pr_body}" >> "$GITHUB_OUTPUT"
-
-        echo "Cat-ting ${pr_dump_file}..."
-        cat "${pr_dump_file}"
-
     - name: Determine new tag version
-      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      if: ${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
       env:
         PR_BODY: ${{ fromJson(steps.get_pr_data.outputs.result).body }}
@@ -101,7 +81,7 @@ runs:
       run: |
         echo "Determining whether user selected an auto-tag option..."
         echo "Using GitHub script to get PR info..."
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}" "${PR_NUMBER}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh"
         if $? != 0; then
           exit 1
         fi

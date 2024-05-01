@@ -55,9 +55,9 @@ runs:
 
         echo "Cat-ting ${pr_dump_file}..."
         cat "${pr_dump_file}"
-        PR_BODY=$(cat "${pr_dump_file}")
 
         echo "Determining whether user has selected an auto-tag option..."
+        PR_BODY="$(cat ${pr_dump_file})"
         script_output=$("${{ github.action_path }}/auto-tag.sh")
 
         if $? != 0; then

@@ -20,9 +20,6 @@ outputs:
   new_tag:
     description: "Next tag version"
     value: ${{ steps.determine_next_tag.outputs.new_tag }}
-  escaped_pr_body:
-    description: "Escaped PR body"
-    value: ${{ steps.escape_pr_body.outputs.escaped_pr_body }}
 
 runs:
   using: "composite"

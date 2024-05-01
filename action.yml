@@ -49,6 +49,7 @@ runs:
         rm -f "${pr_dump_file}"
         touch "${pr_dump_file}"
         echo "Dumping PR body to file..."
+        set -x
         cat > "./escaped_pr_body" <<EOF
         "${{ inputs.pr_body }}"
         EOF

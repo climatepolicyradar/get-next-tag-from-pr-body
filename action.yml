@@ -45,6 +45,7 @@ runs:
       run: |
         PR_NUMBER="${{ inputs.pr_number }}"
 
+        pr_dump_file="./escaped_pr_body"
         rm -f "${pr_dump_file}"
         touch "${pr_dump_file}"
         echo "Dumping PR body to file..."

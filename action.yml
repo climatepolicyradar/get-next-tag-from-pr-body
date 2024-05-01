@@ -75,6 +75,7 @@ runs:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
         echo "Dumping PR body to file..."
+        rm -f "${pr_dump_file}"
         touch "${pr_dump_file}"
         cat > "${pr_dump_file}" <<EOF
         "${{ fromJson(steps.get_pr_data.outputs.result).body }}"

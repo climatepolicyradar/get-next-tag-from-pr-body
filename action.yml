@@ -51,9 +51,9 @@ runs:
         echo "Dumping PR body to file..."
         pr_body="${{ inputs.pr_body }}"
         set -x
-        cat > "${pr_dump_file}" <<EOF
-        "${pr_body}"
-        EOF
+
+        cat <<< \""${{ inputs.pr_body }}"\" > "${pr_dump_file}"
+
 
         echo "Cat-ting $pr_dump_file..."
         cat "$pr_dump_file"

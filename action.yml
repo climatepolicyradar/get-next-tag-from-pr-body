@@ -56,7 +56,7 @@ runs:
         echo "new_tag=${new_tag}"  >> "$GITHUB_OUTPUT"
 
     - uses: actions/github-script@v7
-      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') }}
+      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') }}
       id: get_pr_data
       with:
         script: |
@@ -69,7 +69,8 @@ runs:
           ).data[0];
 
     - name: Dump PR body file
-      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      if: ${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: bash
       env:
         pr_dump_file: "./tmp_pr_body_dump.txt"
@@ -85,7 +86,8 @@ runs:
         cat "${pr_dump_file}"
 
     - name: Determine new tag version
-      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      # if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      if: ${{ steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: sh
       env:
         PR_NUMBER: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"

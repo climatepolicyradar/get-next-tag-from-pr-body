@@ -86,7 +86,7 @@ runs:
       if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: bash
       run: |
-        echo "::set-env name=PULL_NUMBER::$(echo ${{ steps.get_pr_data.outputs.result }} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')"
+        echo "::set-env name=env3::$(echo ${{ steps.get_pr_data.outputs.result }} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')"
         echo "${env3}"
 
     - name: Set PR body as a multiline env var unquoted

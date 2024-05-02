@@ -89,6 +89,35 @@ runs:
         echo "::set-env name=env3::$(echo ${{ steps.get_pr_data.outputs.result }} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')"
         echo "${env3}"
 
+    - name: Set PR body as env var 3
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        echo "env3=$(echo ${{ fromJson(steps.get_pr_data.outputs.result).body }} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')"  >> "$GITHUB_ENV"
+        echo "${env3}"
+
+    - name: Set PR body as a multiline env var unquoted
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        {
+          echo 'JSON_RESPONSE'<<EOF
+          ${{ steps.get_pr_data.outputs.result }}
+          EOF
+        } >> "$GITHUB_ENV"
+        echo "${JSON_RESPONSE}"
+      
+    - name: Set PR body as a multiline env var unquoted
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        {
+          echo JSON_RESPONSE<<EOF
+          ${{ steps.get_pr_data.outputs.result }}
+          EOF
+        } >> "$GITHUB_ENV"
+        echo "${JSON_RESPONSE}"
+
     - name: Set PR body as a multiline env var unquoted
       if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: bash

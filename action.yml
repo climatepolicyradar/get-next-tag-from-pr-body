@@ -75,6 +75,11 @@ runs:
       env:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
+        echo "Debug dump"
+        echo "${{ steps.get_pr_data.outputs.result }}"
+        echo "${{ fromJson(steps.get_pr_data.outputs.result) }}"
+        echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+
         echo "Dumping PR body to file..."
         rm -f "${pr_dump_file}"
         touch "${pr_dump_file}"

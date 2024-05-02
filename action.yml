@@ -76,7 +76,10 @@ runs:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
         echo "Debug dump"
+        echo "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}"
+        echo ${{ steps.get_pr_data.outputs.result }}
         echo "${{ steps.get_pr_data.outputs.result }}"
+        echo ${{ fromJson(steps.get_pr_data.outputs.result) }}
         echo "${{ fromJson(steps.get_pr_data.outputs.result) }}"
         echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
 

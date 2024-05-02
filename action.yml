@@ -77,10 +77,15 @@ runs:
       run: |
         echo "Debug dump"
         echo "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}"
+        echo "Result no quote"
         echo ${{ steps.get_pr_data.outputs.result }}
+        echo "Result double quote"
         echo "${{ steps.get_pr_data.outputs.result }}"
+        echo "JSON Result no quote"
         echo ${{ fromJson(steps.get_pr_data.outputs.result) }}
+        echo "JSON Result double quote"
         echo "${{ fromJson(steps.get_pr_data.outputs.result) }}"
+        echo "JSON Result body double quote"
         echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
 
         echo "Dumping PR body to file..."

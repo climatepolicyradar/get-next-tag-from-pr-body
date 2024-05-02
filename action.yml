@@ -68,40 +68,88 @@ runs:
             })
           ).data[0];
 
+    - name: Set PR body as env var 1
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        echo "env2=${{ steps.get_pr_data.outputs.result }}" >> "$GITHUB_ENV"
+        echo "${env2}"
+
+    - name: Set PR body as env var 2
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        echo "env1=\"${{ steps.get_pr_data.outputs.result }}\"" >> "$GITHUB_ENV"
+        echo "${env1}"
+
+    - name: Set PR body as a multiline env var unquoted
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        {
+          echo 'JSON_RESPONSE<<EOF'
+          ${{ steps.get_pr_data.outputs.result }}
+        } >> "$GITHUB_ENV"
+        echo "${'JSON_RESPONSE}"
+
+    - name: Set PR body as a multiline env var quoted
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      shell: bash
+      run: |
+        {
+          echo 'JSON_RESPONSE<<EOF'
+          "${{ steps.get_pr_data.outputs.result }}"
+        } >> "$GITHUB_ENV"
+        echo "${'JSON_RESPONSE}"
+
     - name: Determine new tag version
-      if: ${{ (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
+      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: bash
       id: determine_next_tag_retrospectively
       env:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
         echo "Debug dump"
-        echo "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}"
-        echo "Result double quote"
-        echo "${{ steps.get_pr_data.outputs.result }}"
-        echo "JSON Result double quote"
-        echo "${{ fromJson(steps.get_pr_data.outputs.result) }}"
-        echo "JSON Result body double quote"
-        echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-        echo "Result no quote"
-        echo ${{ steps.get_pr_data.outputs.result }}
-        echo "JSON Result no quote"
-        echo ${{ fromJson(steps.get_pr_data.outputs.result) }}
 
-        echo "Dumping PR body to file..."
-        rm -f "${pr_dump_file}"
-        touch "${pr_dump_file}"
-        pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-        cat > "${pr_dump_file}" <<EOF
-        "${pr_body}"
-        EOF
+        if [[ "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}" = 'true' ]]; then
+          echo "PR body contains special characters."
 
-        echo "Cat-ting ${pr_dump_file}..."
-        cat "${pr_dump_file}"
+          text="${text//$'%'/%25}"
+          text="${text//$'\n'/%0A}"
+          text="${text//$'\r'/%0D}"
+          echo "::set-env name=escaped::$text"
+
+          echo "Result double quote"
+          echo "${{ steps.get_pr_data.outputs.result }}"
+          echo "JSON Result double quote"
+          echo "${{ fromJson(steps.get_pr_data.outputs.result) }}"
+          echo "JSON Result body double quote"
+          echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+          echo "Result no quote"
+          echo ${{ steps.get_pr_data.outputs.result }}
+          echo "JSON Result no quote"
+          echo ${{ fromJson(steps.get_pr_data.outputs.result) }}
+
+          echo "Dumping PR body to file..."
+          rm -f "${pr_dump_file}"
+          touch "${pr_dump_file}"
+          pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+          cat > "${pr_dump_file}" <<EOF
+          "${pr_body}"
+          EOF
+
+          echo "Cat-ting ${pr_dump_file}..."
+          cat "${pr_dump_file}"
+          PR_BODY="${pr_dump_file}"
+
+        else
+          echo "PR body doesn't contain any special characters."
+          PR_BODY="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        fi
 
         echo "Determining whether user selected an auto-tag option..."
         PR_NUMBER=${{ fromJson(steps.get_pr_data.outputs.result).number }}
-        script_output=$("${{ github.action_path }}/auto-tag.sh" "${pr_dump_file}")
+        script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}")
         if $? != 0; then
           exit 1
         fi

@@ -76,12 +76,9 @@ runs:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
         if [[
-          "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}" = 'true' ||
           "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"<"'))}}" = 'true'
-          "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('">"'))}}" = 'true'
         ]]; then
-          echo "PR body contains special characters."
-          echo "Please remove special chars '`', '<' and '>' from PR description and try again."
+          echo "Please remove HTML tags from PR description and try again."
           exit 1
 
         else

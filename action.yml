@@ -68,78 +68,6 @@ runs:
             })
           ).data[0];
 
-    - name: Set PR body as env var 1
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        echo "env2=${{ steps.get_pr_data.outputs.result }}" >> "$GITHUB_ENV"
-        echo "${env2}"
-
-    - name: Set PR body as env var 2
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        echo "env1=\"${{ steps.get_pr_data.outputs.result }}\"" >> "$GITHUB_ENV"
-        echo "${env1}"
-
-    - name: Set PR body as env var 3
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        echo "::set-env name=env3::$(echo ${{ steps.get_pr_data.outputs.result }} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')"
-        echo "${env3}"
-
-    - name: Set PR body as env var 3
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        echo "env3=$(echo ${{ fromJson(steps.get_pr_data.outputs.result).body }} | awk '/^## Proposed version/,/^Notes:/ {if (!/^## Proposed version/ && !/^Notes:/) print}')"  >> "$GITHUB_ENV"
-        echo "${env3}"
-
-    - name: Set PR body as a multiline env var unquoted
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        {
-          echo 'JSON_RESPONSE'<<EOF
-          ${{ steps.get_pr_data.outputs.result }}
-          EOF
-        } >> "$GITHUB_ENV"
-        echo "${JSON_RESPONSE}"
-      
-    - name: Set PR body as a multiline env var unquoted
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        {
-          echo JSON_RESPONSE<<EOF
-          ${{ steps.get_pr_data.outputs.result }}
-          EOF
-        } >> "$GITHUB_ENV"
-        echo "${JSON_RESPONSE}"
-
-    - name: Set PR body as a multiline env var unquoted
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        {
-          echo 'JSON_RESPONSE<<EOF'
-          ${{ steps.get_pr_data.outputs.result }}
-          EOF
-        } >> "$GITHUB_ENV"
-        echo "${'JSON_RESPONSE}"
-
-    - name: Set PR body as a multiline env var quoted
-      if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
-      shell: bash
-      run: |
-        {
-          echo 'JSON_RESPONSE<<EOF'
-          "${{ steps.get_pr_data.outputs.result }}"
-          EOF
-        } >> "$GITHUB_ENV"
-        echo "${'JSON_RESPONSE}"
-
     - name: Determine new tag version
       if: ${{ always() && (inputs.pr_body == '' && inputs.pr_number == '') && steps.get_pr_data.outputs.result && (fromJSON(steps.get_pr_data.outputs.result).number && fromJSON(steps.get_pr_data.outputs.result).body) }}
       shell: bash
@@ -147,38 +75,14 @@ runs:
       env:
         pr_dump_file: "./tmp_pr_body_dump.txt"
       run: |
-        echo "Debug dump"
-
-        if [[ "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}" = 'true' ]]; then
+        if [[
+          "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"`"'))}}" = 'true' ||
+          "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"<"'))}}" = 'true'
+          "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('">"'))}}" = 'true'
+        ]]; then
           echo "PR body contains special characters."
-
-          text="${text//$'%'/%25}"
-          text="${text//$'\n'/%0A}"
-          text="${text//$'\r'/%0D}"
-          echo "::set-env name=escaped::$text"
-
-          echo "Result double quote"
-          echo "${{ steps.get_pr_data.outputs.result }}"
-          echo "JSON Result double quote"
-          echo "${{ fromJson(steps.get_pr_data.outputs.result) }}"
-          echo "JSON Result body double quote"
-          echo "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-          echo "Result no quote"
-          echo ${{ steps.get_pr_data.outputs.result }}
-          echo "JSON Result no quote"
-          echo ${{ fromJson(steps.get_pr_data.outputs.result) }}
-
-          echo "Dumping PR body to file..."
-          rm -f "${pr_dump_file}"
-          touch "${pr_dump_file}"
-          pr_body="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
-          cat > "${pr_dump_file}" <<EOF
-          "${pr_body}"
-          EOF
-
-          echo "Cat-ting ${pr_dump_file}..."
-          cat "${pr_dump_file}"
-          PR_BODY="${pr_dump_file}"
+          echo "Please remove special chars '`', '<' and '>' from PR description and try again."
+          exit 1
 
         else
           echo "PR body doesn't contain any special characters."

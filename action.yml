@@ -73,7 +73,8 @@ runs:
       shell: bash
       id: determine_next_tag_retrospectively
       env:
-        pr_dump_file: "./tmp_pr_body_dump.txt"
+        PR_BODY: "${{ fromJson(steps.get_pr_data.outputs.result).body }}"
+        PR_NUMBER: "${{ fromJson(steps.get_pr_data.outputs.result).number }}"
       run: |
         if [[
           "${{contains(format(fromJSON('"{0}"'), fromJson(steps.get_pr_data.outputs.result).body), fromJSON('"<"'))}}" = 'true'
@@ -83,11 +84,9 @@ runs:
 
         else
           echo "PR body doesn't contain any special characters."
-          PR_BODY="${{ fromJson(steps.get_pr_data.outputs.result).body }}"
         fi
 
         echo "Determining whether user selected an auto-tag option..."
-        PR_NUMBER=${{ fromJson(steps.get_pr_data.outputs.result).number }}
         script_output=$("${{ github.action_path }}/auto-tag.sh" "${PR_BODY}")
         if $? != 0; then
           exit 1

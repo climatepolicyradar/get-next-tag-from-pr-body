@@ -112,11 +112,9 @@ is_skip_selected() {
 }
 
 get_latest_tag() {
-	all_tags_on_remote=$(git fetch --prune --unshallow --tags --force) # This is needed - without it no tags are found.
-	if [[ -z $all_tags_on_remote ]]; then
-		latest_tag=v0.1.0-beta
-	else
-		latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)
-	fi
+	git fetch --prune --unshallow --tags --force # This is needed - without it no tags are found.
+	maybe_latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+ 	latest_tag=${maybe_latest_tag:-0.0.0}
+
 	echo "${latest_tag}"
 }

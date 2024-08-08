@@ -115,5 +115,6 @@ get_latest_tag() {
 	git fetch --prune --unshallow --tags --force # This is needed - without it no tags are found.
 	maybe_latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)
  	latest_tag=${maybe_latest_tag:-0.0.0}
+
 	echo "${latest_tag}"
 }
